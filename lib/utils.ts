@@ -160,13 +160,13 @@ export const deepMergeObjects = <
         !Array.isArray(obj2[key])
       ) {
         // Recursively merge nested objects
-        output[key] = deepMergeObjects(
+        (output as Record<string, unknown>)[key] = deepMergeObjects(
           obj1[key] as Record<string, unknown>,
           obj2[key] as Record<string, unknown>
-        ) as any; // Type assertion for recursive merge
+        ) as unknown as T[typeof key] & U[typeof key];
       } else {
         // Assign obj1's value when it's not an object or when obj2 doesn't have the key
-        (output as Record<string, unknown>)[key] = obj1[key];
+        (output as Record<string, unknown>)[key] = obj1[key] as T[typeof key] & U[typeof key];
       }
     }
   }
