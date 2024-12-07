@@ -1,31 +1,28 @@
 import { aspectRatioOptions } from "@/constants";
-import { clsx, type ClassValue } from "clsx"
+import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import qs from "qs";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 // ERROR HANDLER
 export const handleError = (error: unknown) => {
   if (error instanceof Error) {
-    // This is a native JavaScript error (e.g., TypeError, RangeError)
     console.error(error.message);
     throw new Error(`Error: ${error.message}`);
   } else if (typeof error === "string") {
-    // This is a string error message
     console.error(error);
     throw new Error(`Error: ${error}`);
   } else {
-    // This is an unknown type of error
     console.error(error);
     throw new Error(`Unknown error: ${JSON.stringify(error)}`);
   }
 };
 
 // PLACEHOLDER LOADER - while image is transforming
-const shimmer = (w: number, h: number) => `
+const shimmer = (w: number, h: number): string => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
     <linearGradient id="g">
@@ -39,7 +36,7 @@ const shimmer = (w: number, h: number) => `
   <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
 </svg>`;
 
-const toBase64 = (str: string) =>
+const toBase64 = (str: string): string =>
   typeof window === "undefined"
     ? Buffer.from(str).toString("base64")
     : window.btoa(str);
@@ -47,14 +44,19 @@ const toBase64 = (str: string) =>
 export const dataUrl = `data:image/svg+xml;base64,${toBase64(
   shimmer(1000, 1000)
 )}`;
-// ==== End
 
 // FORM URL QUERY
+interface FormUrlQueryParams {
+  searchParams: URLSearchParams;
+  key: string;
+  value: string;
+}
+
 export const formUrlQuery = ({
   searchParams,
   key,
   value,
-}: FormUrlQueryParams) => {
+}: FormUrlQueryParams): string => {
   const params = { ...qs.parse(searchParams.toString()), [key]: value };
 
   return `${window.location.pathname}?${qs.stringify(params, {
@@ -63,38 +65,46 @@ export const formUrlQuery = ({
 };
 
 // REMOVE KEY FROM QUERY
+interface RemoveUrlQueryParams {
+  searchParams: URLSearchParams;
+  keysToRemove: string[];
+}
+
 export function removeKeysFromQuery({
   searchParams,
   keysToRemove,
-}: RemoveUrlQueryParams) {
-  const currentUrl = qs.parse(searchParams);
+}: RemoveUrlQueryParams): string {
+  const currentUrl = qs.parse(searchParams.toString());
 
   keysToRemove.forEach((key) => {
     delete currentUrl[key];
   });
 
-  // Remove null or undefined values
   Object.keys(currentUrl).forEach(
-    (key) => currentUrl[key] == null && delete currentUrl[key]
+    (key) => currentUrl[key as keyof typeof currentUrl] == null && delete currentUrl[key]
   );
 
   return `${window.location.pathname}?${qs.stringify(currentUrl)}`;
 }
 
 // DEBOUNCE
-export const debounce = (func: (...args: any[]) => void, delay: number) => {
+export const debounce = <T extends unknown[]>(
+  func: (...args: T) => void,
+  delay: number
+) => {
   let timeoutId: NodeJS.Timeout | null;
-  return (...args: any[]) => {
+  return (...args: T) => {
     if (timeoutId) clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(null, args), delay);
+    timeoutId = setTimeout(() => func(...args), delay);
   };
 };
 
-// GE IMAGE SIZE
+// GET IMAGE SIZE
 export type AspectRatioKey = keyof typeof aspectRatioOptions;
+
 export const getImageSize = (
   type: string,
-  image: any,
+  image: Record<string, number | string>,
   dimension: "width" | "height"
 ): number => {
   if (type === "fill") {
@@ -103,7 +113,7 @@ export const getImageSize = (
       1000
     );
   }
-  return image?.[dimension] || 1000;
+  return (image?.[dimension] as number) || 1000;
 };
 
 // DOWNLOAD IMAGE
@@ -120,32 +130,43 @@ export const download = (url: string, filename: string) => {
       a.href = blobURL;
 
       if (filename && filename.length)
-        a.download = `${filename.replace(" ", "_")}.png`;
+        a.download = `${filename.replace(/\s+/g, "_")}.png`;
       document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
     })
     .catch((error) => console.log({ error }));
 };
 
 // DEEP MERGE OBJECTS
-export const deepMergeObjects = (obj1: any, obj2: any) => {
-  if(obj2 === null || obj2 === undefined) {
-    return obj1;
-  }
+export const deepMergeObjects = <
+  T extends Record<string, unknown>,
+  U extends Record<string, unknown>
+>(
+  obj1: T,
+  obj2: U
+): T & U => {
+  // Initialize the result object as a shallow copy of obj2
+  const output = { ...obj2 } as T & U;
 
-  let output = { ...obj2 };
-
-  for (let key in obj1) {
-    if (obj1.hasOwnProperty(key)) {
+  for (const key in obj1) {
+    if (Object.prototype.hasOwnProperty.call(obj1, key)) {
       if (
         obj1[key] &&
         typeof obj1[key] === "object" &&
+        !Array.isArray(obj1[key]) &&
         obj2[key] &&
-        typeof obj2[key] === "object"
+        typeof obj2[key] === "object" &&
+        !Array.isArray(obj2[key])
       ) {
-        output[key] = deepMergeObjects(obj1[key], obj2[key]);
+        // Recursively merge nested objects
+        output[key] = deepMergeObjects(
+          obj1[key] as Record<string, unknown>,
+          obj2[key] as Record<string, unknown>
+        ) as any; // Type assertion for recursive merge
       } else {
-        output[key] = obj1[key];
+        // Assign obj1's value when it's not an object or when obj2 doesn't have the key
+        (output as Record<string, unknown>)[key] = obj1[key];
       }
     }
   }
