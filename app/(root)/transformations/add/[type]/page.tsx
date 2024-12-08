@@ -8,7 +8,12 @@ import { useUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import React from 'react'
 
-const AddTransformationTypePage = async ({params: { type } }: SearchParamProps) => {
+interface AddTransformationTypePageProps {
+  params: { type: TransformationTypeKey }; // Match dynamic route
+  searchParams?: { [key: string]: string | string[] | undefined }; // Optional searchParams
+}
+
+const AddTransformationTypePage = async ({params: { type } }: AddTransformationTypePageProps) => {
   const { user: clerk } = useUser();
   const clerk_id = clerk?.id;
   const transformation = transformationTypes[type];
