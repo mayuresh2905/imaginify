@@ -5,26 +5,29 @@ import TransformationForm from '@/components/shared/TransformationForm';
 import { transformationTypes } from '@/constants'
 import { getUserById } from '@/lib/actions/user.actions';
 import { useUser } from '@clerk/nextjs';
-import { redirect } from 'next/navigation';
+import { redirect, useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
-interface AddTransformationTypePageProps {
-  params: { type: TransformationTypeKey }; // Match dynamic route
-  searchParams?: { [key: string]: string | string[] | undefined }; // Optional searchParams
-}
 
-const AddTransformationTypePage = ({params: { type } }: AddTransformationTypePageProps) => {
+type TransformationTypeKey = keyof typeof transformationTypes; // Extract valid keys
+
+const AddTransformationTypePage = () => {
+  const { type } = useParams();
   const { user: clerk } = useUser();
   const clerk_id = clerk?.id;
-  const transformation = transformationTypes[type];
+
+  // Ensure type is a valid key
+  const transformationKey = Array.isArray(type) ? type[0] : type; // Handle string[]
+  if (!transformationKey || !(transformationKey in transformationTypes)) {
+    redirect('/error');
+  }
+
+  const transformation = transformationTypes[transformationKey as TransformationTypeKey];
   const [user, setUser] = useState<any | null>(null);
 
   if(!clerk_id) redirect('/sign-in')
 
   if (!transformation) redirect('/error'); // Handle invalid transformation type
-    
-
-  
 
   useEffect(() => {
     const fetchUserData = async () => {
