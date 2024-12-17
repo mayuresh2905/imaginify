@@ -1,6 +1,5 @@
-"use client";
 
-import { redirect, useParams } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import Header from "@/components/shared/Header";
 import TransformationForm from "@/components/shared/TransformationForm";
@@ -9,8 +8,7 @@ import { getUserById } from "@/lib/actions/user.actions";
 import { getImageById } from "@/lib/actions/image.actions";
 import { auth } from "@clerk/nextjs/server";
 
-const Page = async () => {
-  const { id } = useParams();
+const Page = async ({ params: { id } }: SearchParamProps) => {
   const { userId } = await auth();
 
   if (!userId) redirect("/sign-in");
