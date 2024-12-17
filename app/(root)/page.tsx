@@ -5,9 +5,9 @@ import React from 'react'
 import { getAllImages } from '@/lib/actions/image.actions';
 import { Collection } from '@/components/shared/Collection';
 
-const Home = async ({ searchParams }: SearchParamProps) => {
-  const page = Number( await searchParams?.page) || 1;
-  const searchQuery = (await searchParams?.query as string) || '';
+const Home = async (props:{searchParams : SearchParamProps}) => {
+  const page = Number( await props.searchParams.searchParams?.page) || 1;
+  const searchQuery = (await props.searchParams.searchParams?.query as string) || '';
 
   const images = await getAllImages({page, searchQuery})
 
