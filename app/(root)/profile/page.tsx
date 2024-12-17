@@ -16,7 +16,7 @@ interface SearchProps {
 };
 
 const Profile = async ({ searchParams }: SearchProps) => {
-  const page = Number(searchParams?.page) || 1;
+  const page = Number(await searchParams?.page) || 1;
   const { userId } = await auth();
 
   if (!userId) redirect("/sign-in");

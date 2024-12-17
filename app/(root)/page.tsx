@@ -13,8 +13,8 @@ interface SearchProps {
 };
 
 const Home = async ({ searchParams }: SearchProps) => {
-  const page = Number( searchParams?.page) || 1;
-  const searchQuery = (searchParams?.query as string) || '';
+  const page = Number( await searchParams?.page) || 1;
+  const searchQuery = (await searchParams?.query as string) || '';
 
   const images = await getAllImages({page, searchQuery})
 
