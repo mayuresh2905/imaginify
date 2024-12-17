@@ -1,4 +1,3 @@
-"use client"
 
 import Header from '@/components/shared/Header'
 import TransformationForm from '@/components/shared/TransformationForm';
@@ -12,8 +11,7 @@ import React, { useEffect, useState } from 'react'
 
 type TransformationTypeKey = keyof typeof transformationTypes; // Extract valid keys
 
-const AddTransformationTypePage = async () => {
-  const { type } = useParams();
+const AddTransformationTypePage = async ({ params: { type } }: SearchParamProps) => {
   const { userId } = await auth();
 
   // Ensure type is a valid key
