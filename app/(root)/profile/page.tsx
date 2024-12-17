@@ -9,7 +9,7 @@ import { auth } from "@clerk/nextjs/server";
 
 
 type SearchProps = {
-  searchParams: Record<string, string | string[] | undefined>;
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 const Profile = async ({searchParams}: SearchProps) => {

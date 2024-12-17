@@ -6,10 +6,10 @@ import { getAllImages } from '@/lib/actions/image.actions';
 import { Collection } from '@/components/shared/Collection';
 
 type SearchProps = {
-  searchParams: Record<string, string | string[] | undefined>;
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
-const Home = async ({searchParams,}: SearchProps) => {
+const Home = async ({searchParams}: SearchProps) => {
   const page = Number(searchParams?.page) || 1;
   const searchQuery = (searchParams?.query as string) || '';
 
