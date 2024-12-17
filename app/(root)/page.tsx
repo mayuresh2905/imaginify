@@ -5,16 +5,14 @@ import React from 'react'
 import { getAllImages } from '@/lib/actions/image.actions';
 import { Collection } from '@/components/shared/Collection';
 
-interface SearchProps {
-  searchParams: {
-    page?: string;
-    query?: string;
-  };
-};
 
-const Home = async ({ searchParams }: SearchProps) => {
-  const page = Number( await searchParams?.page) || 1;
-  const searchQuery = (await searchParams?.query as string) || '';
+const Home = async ({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) => {
+  const page = Number(searchParams?.page) || 1;
+  const searchQuery = (searchParams?.query as string) || '';
 
   const images = await getAllImages({page, searchQuery})
 
