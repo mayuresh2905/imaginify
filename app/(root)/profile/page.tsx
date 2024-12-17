@@ -8,12 +8,11 @@ import { getUserById } from "@/lib/actions/user.actions";
 import { auth } from "@clerk/nextjs/server";
 
 
+type SearchProps = {
+  searchParams: Record<string, string | string[] | undefined>;
+};
 
-const Profile = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) => {
+const Profile = async ({searchParams}: SearchProps) => {
   const page = Number(searchParams?.page) || 1;
   const { userId } = await auth();
 
