@@ -47,16 +47,16 @@ export const dataUrl = `data:image/svg+xml;base64,${toBase64(
 
 // FORM URL QUERY
 interface FormUrlQueryParams {
-  searchParams: URLSearchParams;
+  searchParams: string;
   key: string;
-  value: string;
+  value: string | number | null;
 }
 
 export const formUrlQuery = ({
   searchParams,
   key,
   value,
-}: FormUrlQueryParams): string => {
+}: FormUrlQueryParams) => {
   const params = { ...qs.parse(searchParams.toString()), [key]: value };
 
   return `${window.location.pathname}?${qs.stringify(params, {
@@ -66,7 +66,7 @@ export const formUrlQuery = ({
 
 // REMOVE KEY FROM QUERY
 interface RemoveUrlQueryParams {
-  searchParams: URLSearchParams;
+  searchParams: string;
   keysToRemove: string[];
 }
 
@@ -139,34 +139,24 @@ export const download = (url: string, filename: string) => {
 };
 
 // DEEP MERGE OBJECTS
-export const deepMergeObjects = <
-  T extends Record<string, unknown>,
-  U extends Record<string, unknown>
->(
-  obj1: T,
-  obj2: U
-): T & U => {
-  // Initialize the result object as a shallow copy of obj2
-  const output = { ...obj2 } as T & U;
+export const deepMergeObjects = (obj1: any, obj2: any) => {
+  if(obj2 === null || obj2 === undefined) {
+    return obj1;
+  }
 
-  for (const key in obj1) {
-    if (Object.prototype.hasOwnProperty.call(obj1, key)) {
+  let output = { ...obj2 };
+
+  for (let key in obj1) {
+    if (obj1.hasOwnProperty(key)) {
       if (
         obj1[key] &&
         typeof obj1[key] === "object" &&
-        !Array.isArray(obj1[key]) &&
         obj2[key] &&
-        typeof obj2[key] === "object" &&
-        !Array.isArray(obj2[key])
+        typeof obj2[key] === "object"
       ) {
-        // Recursively merge nested objects
-        (output as Record<string, unknown>)[key] = deepMergeObjects(
-          obj1[key] as Record<string, unknown>,
-          obj2[key] as Record<string, unknown>
-        ) as unknown as T[typeof key] & U[typeof key];
+        output[key] = deepMergeObjects(obj1[key], obj2[key]);
       } else {
-        // Assign obj1's value when it's not an object or when obj2 doesn't have the key
-        (output as Record<string, unknown>)[key] = obj1[key] as T[typeof key] & U[typeof key];
+        output[key] = obj1[key];
       }
     }
   }
