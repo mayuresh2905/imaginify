@@ -1,3 +1,5 @@
+"use client";
+
 import { redirect, useParams } from "next/navigation";
 
 import Header from "@/components/shared/Header";
