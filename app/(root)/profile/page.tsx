@@ -8,7 +8,7 @@ import { getUserById } from "@/lib/actions/user.actions";
 import { auth } from "@clerk/nextjs/server";
 
 
-type SearchProps = {
+interface SearchProps {
   searchParams: {
     page?: string;
     query?: string;

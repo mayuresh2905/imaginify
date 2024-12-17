@@ -5,7 +5,7 @@ import React from 'react'
 import { getAllImages } from '@/lib/actions/image.actions';
 import { Collection } from '@/components/shared/Collection';
 
-type SearchProps = {
+interface SearchProps {
   searchParams: {
     page?: string;
     query?: string;
