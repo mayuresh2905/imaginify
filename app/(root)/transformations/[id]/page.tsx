@@ -10,7 +10,8 @@ import { DeleteConfirmation } from "@/components/shared/DeleteConfirmation";
 import { auth } from "@clerk/nextjs/server";
 
 
-const ImageDetails = async ({ params: { id } }: SearchParamProps) => {
+const ImageDetails = async ({ params }: SearchParamProps) => {
+  const { id } = await params;
   const { userId } = await auth();
 
   const image = await getImageById(id);
