@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
@@ -9,12 +10,14 @@ import { auth } from "@clerk/nextjs/server";
 
 
 type SearchProps = {
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 const Profile = async ({searchParams}: SearchProps) => {
-  const page = Number(searchParams?.page) || 1;
+  const { page: pageParams } = await searchParams;
   const { userId } = await auth();
+
+  const page = Number(pageParams) || 1;
 
   if (!userId) redirect("/sign-in");
 

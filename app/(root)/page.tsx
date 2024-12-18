@@ -6,12 +6,13 @@ import { getAllImages } from '@/lib/actions/image.actions';
 import { Collection } from '@/components/shared/Collection';
 
 type SearchProps = {
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 const Home = async ({searchParams}: SearchProps) => {
-  const page = Number(searchParams?.page) || 1;
-  const searchQuery = (searchParams?.query as string) || '';
+  const { page: pageParams , query: queryParams } = await searchParams;
+  const page = Number(pageParams) || 1;
+  const searchQuery = (queryParams as string) || '';
 
   const images = await getAllImages({page, searchQuery})
 
